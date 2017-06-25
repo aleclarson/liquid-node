@@ -7,7 +7,6 @@ module.exports = function(engine){
     require("./decrement")(engine);
     require("./for")(engine);
     require("./if")(engine);
-    require("./include")(engine);
     require("./increment")(engine);
     require("./layout")(engine);
     require("./raw")(engine);

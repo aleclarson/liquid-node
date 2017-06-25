@@ -1,33 +1,7 @@
 {
-  "name": "shopify-liquid",
+  "name": "liquid-node",
   "version": "1.8.0",
-  "description": "A feature-rich Liquid template engine for Node.js and browsers, with compliance with the Ruby version.",
   "main": "index.js",
-  "scripts": {
-    "lint": "eslint src/ test/",
-    "test": "npm run lint && mocha --recursive",
-    "dist": "make dist",
-    "preversion": "npm test",
-    "version": "npm run dist && git add -A dist",
-    "postversion": "git push && git push --tags"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/harttle/shopify-liquid.git"
-  },
-  "keywords": [
-    "liquid",
-    "template engine",
-    "express",
-    "jinja",
-    "shopify"
-  ],
-  "author": "Harttle",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/harttle/shopify-liquid/issues"
-  },
-  "homepage": "https://github.com/harttle/shopify-liquid#readme",
   "devDependencies": {
     "babel-preset-es2015": "^6.14.0",
     "babelify": "^7.3.0",

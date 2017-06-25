@@ -163,8 +163,7 @@ exports.factory = function (ctx, opts) {
   opts = _.assign({
     strict_variables: false,
     strict_filters: false,
-    blocks: {},
-    root: []
+    blocks: {}
   }, opts)
 
   ctx = _.assign(ctx, {

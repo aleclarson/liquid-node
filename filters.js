@@ -1,5 +1,5 @@
-const strftime = require('./src/util/strftime.js');
-const isTruthy = require('./src/syntax.js').isTruthy;
+const strftime = require('./src/util/strftime');
+const isTruthy = require('./src/syntax').isTruthy;
 
 var escapeMap = {
     '&': '&amp;',

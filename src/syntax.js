@@ -1,5 +1,5 @@
-const operators = require('./operators.js')
-const lexical = require('./lexical.js')
+const operators = require('./operators')
+const lexical = require('./lexical')
 
 function evalExp (exp, scope) {
   if (!scope) throw Error('unable to evalExp: scope undefined')

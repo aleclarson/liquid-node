@@ -1,5 +1,5 @@
-const lexical = require('./lexical.js')
-const ParseError = require('./util/error.js').ParseError
+const lexical = require('./lexical')
+const ParseError = require('./util/error').ParseError
 
 module.exports = function (Tag, Filter) {
   var stream = {

@@ -1,15 +1,15 @@
 const Scope = require('./src/scope')
-const tokenizer = require('./src/tokenizer.js')
-const Render = require('./src/render.js')
-const lexical = require('./src/lexical.js')
-const Tag = require('./src/tag.js')
-const Filter = require('./src/filter.js')
+const tokenizer = require('./src/tokenizer')
+const Render = require('./src/render')
+const lexical = require('./src/lexical')
+const Tag = require('./src/tag')
+const Filter = require('./src/filter')
 const Parser = require('./src/parser')
-const Syntax = require('./src/syntax.js')
+const Syntax = require('./src/syntax')
 const tags = require('./tags')
 const filters = require('./filters')
-const anySeries = require('./src/util/promise.js').anySeries
-const Errors = require('./src/util/error.js')
+const anySeries = require('./src/util/promise').anySeries
+const Errors = require('./src/util/error')
 
 var _engine = {
   init: function (tag, filter, options) {

@@ -1,7 +1,7 @@
-const Syntax = require('./syntax.js')
-const mapSeries = require('./util/promise.js').mapSeries
-const RenderBreakError = require('./util/error.js').RenderBreakError
-const RenderError = require('./util/error.js').RenderError
+const Syntax = require('./syntax')
+const mapSeries = require('./util/promise').mapSeries
+const RenderBreakError = require('./util/error').RenderBreakError
+const RenderError = require('./util/error').RenderError
 
 var render = {
 

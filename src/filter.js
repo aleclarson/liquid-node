@@ -1,5 +1,5 @@
-const lexical = require('./lexical.js')
-const Syntax = require('./syntax.js')
+const lexical = require('./lexical')
+const Syntax = require('./syntax')
 
 var valueRE = new RegExp(`${lexical.value.source}`, 'g')
 

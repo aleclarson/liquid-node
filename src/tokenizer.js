@@ -1,5 +1,5 @@
-const lexical = require('./lexical.js')
-const TokenizationError = require('./util/error.js').TokenizationError
+const lexical = require('./lexical')
+const TokenizationError = require('./util/error').TokenizationError
 
 function parse (html, filepath, options) {
   if (typeof html !== 'string') throw Error('illegal input type')

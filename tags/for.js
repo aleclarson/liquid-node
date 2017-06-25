@@ -1,6 +1,6 @@
 const Liquid = require('..')
 const lexical = Liquid.lexical
-const mapSeries = require('../src/util/promise.js').mapSeries
+const mapSeries = require('../src/util/promise').mapSeries
 const RenderBreakError = Liquid.Types.RenderBreakError
 const re = new RegExp(`^(${lexical.identifier.source})\\s+in\\s+` +
     `(${lexical.value.source})` +

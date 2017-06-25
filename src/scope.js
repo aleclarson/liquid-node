@@ -1,4 +1,4 @@
-const lexical = require('./lexical.js')
+const lexical = require('./lexical')
 const toStr = Object.prototype.toString
 
 var Scope = {

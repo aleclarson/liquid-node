@@ -1,5 +1,4 @@
 const Scope = require('./src/scope')
-const _ = require('./src/util/underscore.js')
 const tokenizer = require('./src/tokenizer.js')
 const Render = require('./src/render.js')
 const lexical = require('./src/lexical.js')
@@ -30,7 +29,7 @@ var _engine = {
     return this.parser.parse(tokens)
   },
   render: function (tpl, ctx, opts) {
-    opts = _.assign({}, this.options, opts)
+    opts = Object.assign({}, this.options, opts)
     var scope = Scope.factory(ctx, opts)
     return this.renderer.renderTemplates(tpl, scope)
   },
@@ -58,7 +57,7 @@ var _engine = {
 }
 
 function factory (options) {
-  options = _.assign({
+  options = Object.assign({
     trim_right: false,
     trim_left: false,
     strict_filters: false,

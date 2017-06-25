@@ -1,4 +1,3 @@
-const _ = require('./underscore.js')
 
 function TokenizationError (message, token) {
   if (Error.captureStackTrace) {
@@ -18,7 +17,7 @@ TokenizationError.prototype = Object.create(Error.prototype)
 TokenizationError.prototype.constructor = TokenizationError
 
 function ParseError (e, token) {
-  _.assign(this, e)
+  Object.assign(this, e)
   this.originalError = e
   this.name = this.constructor.name
 
@@ -38,7 +37,7 @@ function RenderError (e, tpl) {
   if (e instanceof RenderError) {
     return e
   }
-  _.assign(this, e)
+  Object.assign(this, e)
   this.originalError = e
   this.name = this.constructor.name
 
@@ -75,20 +74,19 @@ AssertionError.prototype.constructor = AssertionError
 
 function mkContext (input, line) {
   var lines = input.split('\n')
-  var begin = Math.max(line - 2, 1)
-  var end = Math.min(line + 3, lines.length)
+  var endIndex = Math.min(line + 3, lines.length)
 
-  var context = _
-        .range(begin, end + 1)
-        .map(l => [
-          (l === line) ? '>> ' : '   ',
-          align(l, end),
-          '| ',
-          lines[l - 1]
-        ].join(''))
-        .join('\n')
+  var index = Math.max(line - 3, 0)
+  while (++index <= endIndex) {
+    lines[index] = [
+      (index === line) ? '>> ' : '   ',
+      align(index, endIndex),
+      '| ',
+      lines[index - 1]
+    ].join('')
+  }
 
-  return context
+  return lines.join('\n')
 }
 
 function align (n, max) {

@@ -1,4 +1,3 @@
-const _ = require('./util/underscore.js')
 const lexical = require('./lexical.js')
 const assert = require('./util/assert.js')
 const toStr = Object.prototype.toString
@@ -7,7 +6,7 @@ var Scope = {
   getAll: function () {
     var ctx = {}
     for (var i = this.scopes.length - 1; i >= 0; i--) {
-      _.assign(ctx, this.scopes[i])
+      Object.assign(ctx, this.scopes[i])
     }
     return ctx
   },
@@ -55,7 +54,7 @@ var Scope = {
     return this.scopes.shift()
   },
   setPropertyByPath: function (obj, path, val) {
-    if (_.isString(path)) {
+    if (typeof path === 'string') {
       var paths = path.replace(/\[/g, '.').replace(/\]/g, '').split('.')
       for (var i = 0; i < paths.length; i++) {
         var key = paths[i]
@@ -160,13 +159,13 @@ function matchRightBracket (str, begin) {
 }
 
 exports.factory = function (ctx, opts) {
-  opts = _.assign({
+  opts = Object.assign({
     strict_variables: false,
     strict_filters: false,
     blocks: {}
   }, opts)
 
-  ctx = _.assign(ctx, {
+  ctx = Object.assign(ctx, {
     liquid: opts
   })
 

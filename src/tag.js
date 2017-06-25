@@ -1,5 +1,4 @@
 const lexical = require('./lexical.js')
-const _ = require('./util/underscore.js')
 const Syntax = require('./syntax.js')
 const assert = require('./util/assert.js')
 
@@ -29,7 +28,7 @@ module.exports = function () {
                 .then(() => typeof impl.render === 'function'
                     ? impl.render(scope, obj) : '')
                 .catch(function (e) {
-                  if (_.isError(e)) {
+                  if (e instanceof Error) {
                     throw e
                   }
                   var msg = `Please reject with an Error in ${impl.render}, got ${e}`

@@ -1,5 +1,4 @@
 const strftime = require('./src/util/strftime.js');
-const _ = require('./src/util/underscore.js');
 const isTruthy = require('./src/syntax.js').isTruthy;
 
 var escapeMap = {
@@ -121,7 +120,9 @@ function bindFixed(cb) {
 }
 
 function registerAll(liquid) {
-    return _.forOwn(filters, (func, name) => liquid.registerFilter(name, func));
+    Object.keys(filters).forEach(name => {
+        liquid.registerFilter(name, filters[name]);
+    });
 }
 
 registerAll.filters = filters;

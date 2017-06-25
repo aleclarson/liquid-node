@@ -1,10 +1,9 @@
 const lexical = require('./lexical.js')
 const TokenizationError = require('./util/error.js').TokenizationError
-const _ = require('./util/underscore.js')
 const assert = require('../src/util/assert.js')
 
 function parse (html, filepath, options) {
-  assert(_.isString(html), 'illegal input type')
+  assert(typeof html === 'string', 'illegal input type')
 
   html = whiteSpaceCtrl(html, options)
 

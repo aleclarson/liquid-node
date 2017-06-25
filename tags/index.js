@@ -8,7 +8,6 @@ module.exports = function(engine){
     require("./for")(engine);
     require("./if")(engine);
     require("./increment")(engine);
-    require("./layout")(engine);
     require("./raw")(engine);
     require("./tablerow")(engine);
     require("./unless")(engine);

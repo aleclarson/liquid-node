@@ -1,6 +1,5 @@
 const lexical = require('./lexical.js')
 const Syntax = require('./syntax.js')
-const assert = require('./util/assert.js')
 
 function hash (markup, scope) {
   var obj = {}
@@ -32,7 +31,7 @@ module.exports = function () {
                     throw e
                   }
                   var msg = `Please reject with an Error in ${impl.render}, got ${e}`
-                  throw new Error(msg)
+                  throw Error(msg)
                 })
     },
     parse: function (token, tokens) {
@@ -41,7 +40,7 @@ module.exports = function () {
       this.name = token.name
 
       var tagImpl = tagImpls[this.name]
-      assert(tagImpl, `tag ${this.name} not found`)
+      if (!tagImpl) throw Error(`tag ${this.name} not found`)
       this.tagImpl = Object.create(tagImpl)
       if (this.tagImpl.parse) {
         this.tagImpl.parse(token, tokens)

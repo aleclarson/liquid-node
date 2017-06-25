@@ -1,5 +1,4 @@
 const lexical = require('./lexical.js')
-const assert = require('./util/assert.js')
 const toStr = Object.prototype.toString
 
 var Scope = {
@@ -32,7 +31,7 @@ var Scope = {
       }
     }
     if (this.opts.strict_variables) {
-      throw new TypeError('undefined variable: ' + str)
+      throw TypeError('undefined variable: ' + str)
     }
   },
   set: function (k, v) {
@@ -40,14 +39,14 @@ var Scope = {
     return this
   },
   push: function (ctx) {
-    assert(ctx, `trying to push ${ctx} into scopes`)
+    if (!ctx) throw Error(`trying to push ${ctx} into scopes`)
     return this.scopes.push(ctx)
   },
   pop: function () {
     return this.scopes.pop()
   },
   unshift: function (ctx) {
-    assert(ctx, `trying to push ${ctx} into scopes`)
+    if (!ctx) throw Error(`trying to push ${ctx} into scopes`)
     return this.scopes.unshift(ctx)
   },
   shift: function () {
@@ -72,7 +71,7 @@ var Scope = {
     var paths = this.propertyAccessSeq(path + '')
     var varName = paths.shift()
     if (!obj.hasOwnProperty(varName)) {
-      throw new TypeError('undefined variable')
+      throw TypeError('undefined variable')
     }
     var variable = obj[varName]
     var lastName = paths.pop()
@@ -108,7 +107,7 @@ var Scope = {
         if (delemiter !== "'" && delemiter !== '"') {
           // foo[bar.coo]
           var j = matchRightBracket(str, i + 1)
-          assert(j !== -1, `unbalanced []: ${str}`)
+          if (j === -1) throw Error(`unbalanced []: ${str}`)
           name = str.slice(i + 1, j)
           if (lexical.isInteger(name)) {
             // foo[1]
@@ -122,7 +121,7 @@ var Scope = {
         } else {
           // foo["bar"]
           j = str.indexOf(delemiter, i + 2)
-          assert(j !== -1, `unbalanced ${delemiter}: ${str}`)
+          if (j === -1) throw Error(`unbalanced ${delemiter}: ${str}`)
           name = str.slice(i + 2, j)
           seq.push(name)
           name = ''

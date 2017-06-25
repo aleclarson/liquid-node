@@ -62,16 +62,6 @@ function RenderBreakError (message) {
 RenderBreakError.prototype = Object.create(Error.prototype)
 RenderBreakError.prototype.constructor = RenderBreakError
 
-function AssertionError (message) {
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, this.constructor)
-  }
-  this.name = this.constructor.name
-  this.message = message
-}
-AssertionError.prototype = Object.create(Error.prototype)
-AssertionError.prototype.constructor = AssertionError
-
 function mkContext (input, line) {
   var lines = input.split('\n')
   var endIndex = Math.min(line + 3, lines.length)
@@ -111,6 +101,5 @@ module.exports = {
   TokenizationError,
   ParseError,
   RenderBreakError,
-  AssertionError,
   RenderError
 }

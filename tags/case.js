@@ -1,5 +1,4 @@
 const Liquid = require('..');
-const assert = require('../src/util/assert.js');
 
 module.exports = function(liquid) {
     liquid.registerTag('case', {
@@ -23,7 +22,7 @@ module.exports = function(liquid) {
                 .on('tag:endcase', token => stream.stop())
                 .on('template', tpl => p.push(tpl))
                 .on('end', x => {
-                    throw new Error(`tag ${tagToken.raw} not closed`);
+                    throw Error(`tag ${tagToken.raw} not closed`);
                 });
 
             stream.start();

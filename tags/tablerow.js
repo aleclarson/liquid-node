@@ -1,6 +1,5 @@
 const Liquid = require('..');
 const lexical = Liquid.lexical;
-const assert = require('../src/util/assert.js');
 const re = new RegExp(`^(${lexical.identifier.source})\\s+in\\s+` +
     `(${lexical.value.source})` +
     `(?:\\s+${lexical.hash.source})*$`);
@@ -10,7 +9,7 @@ module.exports = function(liquid) {
 
         parse: function(tagToken, remainTokens) {
             var match = re.exec(tagToken.args);
-            assert(match, `illegal tag: ${tagToken.raw}`);
+            if (!match) throw Error(`illegal tag: ${tagToken.raw}`);
             this.variable = match[1];
             this.collection = match[2];
 
@@ -21,7 +20,7 @@ module.exports = function(liquid) {
                 .on('tag:endtablerow', token => stream.stop())
                 .on('template', tpl => p.push(tpl))
                 .on('end', x => {
-                    throw new Error(`tag ${tagToken.raw} not closed`);
+                    throw Error(`tag ${tagToken.raw} not closed`);
                 });
 
             stream.start();
@@ -35,7 +34,7 @@ module.exports = function(liquid) {
             var limit = (hash.limit === undefined) ? collection.length : hash.limit;
 
             var cols = hash.cols, row, col;
-            if (!cols) throw new Error(`illegal cols: ${cols}`);
+            if (!cols) throw Error(`illegal cols: ${cols}`);
 
             // build array of arguments to pass to sequential promises...
             collection = collection.slice(offset, offset + limit);

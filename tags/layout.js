@@ -39,7 +39,7 @@ module.exports = function(liquid) {
                 .on('tag:endblock', () => stream.stop())
                 .on('template', tpl => this.tpls.push(tpl))
                 .on('end', () => {
-                    throw new Error(`tag ${token.raw} not closed`);
+                    throw Error(`tag ${token.raw} not closed`);
                 });
             stream.start();
         },

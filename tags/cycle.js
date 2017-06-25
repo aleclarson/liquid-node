@@ -2,14 +2,13 @@ const Liquid = require('..');
 const lexical = Liquid.lexical;
 const groupRE = new RegExp(`^(?:(${lexical.value.source})\\s*:\\s*)?(.*)$`);
 const candidatesRE = new RegExp(lexical.value.source, 'g');
-const assert = require('../src/util/assert.js');
 
 module.exports = function(liquid) {
     liquid.registerTag('cycle', {
 
         parse: function(tagToken, remainTokens) {
             var match = groupRE.exec(tagToken.args);
-            assert(match, `illegal tag: ${tagToken.raw}`);
+            if (!match) throw Error(`illegal tag: ${tagToken.raw}`);
 
             this.group = match[1] || '';
             var candidates = match[2];
@@ -20,7 +19,9 @@ module.exports = function(liquid) {
                 this.candidates.push(match[0]);
             }
 
-            assert(this.candidates.length, `empty candidates: ${tagToken.raw}`);
+            if (!this.candidates.length) {
+              throw Error(`empty candidates: ${tagToken.raw}`);
+            }
         },
 
         render: function(scope, hash) {

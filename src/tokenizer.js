@@ -1,9 +1,8 @@
 const lexical = require('./lexical.js')
 const TokenizationError = require('./util/error.js').TokenizationError
-const assert = require('../src/util/assert.js')
 
 function parse (html, filepath, options) {
-  assert(typeof html === 'string', 'illegal input type')
+  if (typeof html !== 'string') throw Error('illegal input type')
 
   html = whiteSpaceCtrl(html, options)
 
@@ -30,7 +29,7 @@ function parse (html, filepath, options) {
 
       var match = token.value.match(lexical.tagLine)
       if (!match) {
-        throw new TokenizationError(`illegal tag syntax`, token)
+        throw TokenizationError(`illegal tag syntax`, token)
       }
       token.name = match[1]
       token.args = match[2]

@@ -14,7 +14,7 @@ module.exports = function(liquid) {
                 .on('tag:endunless', token => stream.stop())
                 .on('template', tpl => p.push(tpl))
                 .on('end', x => {
-                    throw new Error(`tag ${tagToken.raw} not closed`);
+                    throw Error(`tag ${tagToken.raw} not closed`);
                 });
 
             stream.start();

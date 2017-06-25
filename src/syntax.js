@@ -1,9 +1,8 @@
 const operators = require('./operators.js')
 const lexical = require('./lexical.js')
-const assert = require('../src/util/assert.js')
 
 function evalExp (exp, scope) {
-  assert(scope, 'unable to evalExp: scope undefined')
+  if (!scope) throw Error('unable to evalExp: scope undefined')
   var operatorREs = lexical.operators
   var match
   for (var i = 0; i < operatorREs.length; i++) {

@@ -2,12 +2,11 @@ const Syntax = require('./syntax.js')
 const mapSeries = require('./util/promise.js').mapSeries
 const RenderBreakError = require('./util/error.js').RenderBreakError
 const RenderError = require('./util/error.js').RenderError
-const assert = require('./util/assert.js')
 
 var render = {
 
   renderTemplates: function (templates, scope) {
-    assert(scope, 'unable to evalTemplates: scope undefined')
+    if (!scope) throw Error('unable to evalTemplates: scope undefined')
 
     var html = ''
     return mapSeries(templates, (tpl) => {
@@ -18,7 +17,7 @@ var render = {
             e.resolvedHTML = html
             throw e
           }
-          throw new RenderError(e, tpl)
+          throw RenderError(e, tpl)
         })
     }).then(() => html)
 
@@ -47,7 +46,7 @@ var render = {
   },
 
   evalOutput: function (template, scope) {
-    assert(scope, 'unable to evalOutput: scope undefined')
+    if (!scope) throw Error('unable to evalOutput: scope undefined')
     return template.filters.reduce(
             (prev, filter) => filter.render(prev, scope),
             Syntax.evalExp(template.initial, scope))

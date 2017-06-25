@@ -78,7 +78,6 @@ factory.Types = {
   ParseError: Errors.ParseError,
   TokenizationEroor: Errors.TokenizationError,
   RenderBreakError: Errors.RenderBreakError,
-  AssertionError: Errors.AssertionError
 }
 
 module.exports = factory

@@ -11,7 +11,7 @@ module.exports = function (liquid) {
                   else this.tokens.push(token)
                 })
                 .on('end', x => {
-                  throw new Error(`tag ${tagToken.raw} not closed`)
+                  throw Error(`tag ${tagToken.raw} not closed`)
                 })
       stream.start()
     },

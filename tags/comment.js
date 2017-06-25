@@ -8,7 +8,7 @@ module.exports = function(liquid) {
                     if(token.name === 'endcomment') stream.stop();
                 })
                 .on('end', x => {
-                    throw new Error(`tag ${tagToken.raw} not closed`);
+                    throw Error(`tag ${tagToken.raw} not closed`);
                 });
             stream.start();
         }

@@ -30,7 +30,7 @@ var _engine = {
   },
   render: function (tpl, ctx, opts) {
     opts = Object.assign({}, this.options, opts)
-    var scope = Scope.factory(ctx, opts)
+    var scope = Scope.factory(ctx || {}, opts)
     return this.renderer.renderTemplates(tpl, scope)
   },
   parseAndRender: function (html, ctx, opts) {

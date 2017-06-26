@@ -1,5 +1,5 @@
 
-function TokenizationError (message, token) {
+createType('TokenizationError', function(message, token) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this, this.constructor)
   }
@@ -9,14 +9,12 @@ function TokenizationError (message, token) {
   this.line = token.line
   this.file = token.file
 
-  var context = mkContext(token.input, token.line)
-  this.message = mkMessage(message, token)
+  var context = createContext(token.input, token.line)
+  this.message = createMessage(message, token)
   this.stack = context + '\n' + (this.stack || '')
-}
-TokenizationError.prototype = Object.create(Error.prototype)
-TokenizationError.prototype.constructor = TokenizationError
+})
 
-function ParseError (e, token) {
+createType('ParseError', function(e, token) {
   Object.assign(this, e)
   this.originalError = e
   this.name = this.constructor.name
@@ -25,18 +23,12 @@ function ParseError (e, token) {
   this.line = token.line
   this.file = token.file
 
-  var context = mkContext(token.input, token.line)
-  this.message = mkMessage(e.message || 'Unkown Error', token)
+  var context = createContext(token.input, token.line)
+  this.message = createMessage(e.message || 'Unknown Error', token)
   this.stack = context + '\n' + (e.stack || '')
-}
-ParseError.prototype = Object.create(Error.prototype)
-ParseError.prototype.constructor = ParseError
+})
 
-function RenderError (e, tpl) {
-    // return the original render error
-  if (e instanceof RenderError) {
-    return e
-  }
+createType('RenderError', function(e, tpl) {
   Object.assign(this, e)
   this.originalError = e
   this.name = this.constructor.name
@@ -45,48 +37,53 @@ function RenderError (e, tpl) {
   this.line = tpl.token.line
   this.file = tpl.token.file
 
-  var context = mkContext(tpl.token.input, tpl.token.line)
-  this.message = mkMessage(e.message || 'Unkown Error', tpl.token)
+  var context = createContext(tpl.token.input, tpl.token.line)
+  this.message = createMessage(e.message || 'Unknown Error', tpl.token)
   this.stack = context + '\n' + (e.stack || '')
-}
-RenderError.prototype = Object.create(Error.prototype)
-RenderError.prototype.constructor = RenderError
+})
 
-function RenderBreakError (message) {
+createType('RenderBreakError', function(message) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this, this.constructor)
   }
   this.name = this.constructor.name
   this.message = message || ''
-}
-RenderBreakError.prototype = Object.create(Error.prototype)
-RenderBreakError.prototype.constructor = RenderBreakError
+})
 
-function mkContext (input, line) {
+function createType(name, init) {
+  var ctr = function(e) {
+    if (e instanceof ctr) {
+      return e
+    }
+    var self = Object.create(ctr.prototype)
+    init.apply(self, arguments)
+    return self
+  }
+  Object.defineProperty(ctr, 'name', {value: name})
+  ctr.prototype = Object.create(Error.prototype)
+  ctr.prototype.constructor = ctr
+  return exports[name] = ctr
+}
+
+function createContext(input, line) {
   var lines = input.split('\n')
   var endIndex = Math.min(line + 3, lines.length)
 
+  var ctx = []
   var index = Math.max(line - 3, 0)
   while (++index <= endIndex) {
-    lines[index] = [
+    ctx.push([
       (index === line) ? '>> ' : '   ',
       align(index, endIndex),
       '| ',
       lines[index - 1]
-    ].join('')
+    ].join(''))
   }
 
-  return lines.join('\n')
+  return ctx.map(line => line + '\n').join('')
 }
 
-function align (n, max) {
-  var length = (max + '').length
-  var str = n + ''
-  var blank = Array(length - str.length).join(' ')
-  return blank + str
-}
-
-function mkMessage (msg, token) {
+function createMessage(msg, token) {
   msg = msg || ''
   if (token.file) {
     msg += ', file:' + token.file
@@ -97,9 +94,9 @@ function mkMessage (msg, token) {
   return msg
 }
 
-module.exports = {
-  TokenizationError,
-  ParseError,
-  RenderBreakError,
-  RenderError
+function align(n, max) {
+  var length = (max + '').length
+  var str = n + ''
+  var blank = Array(length - str.length).join(' ')
+  return blank + str
 }

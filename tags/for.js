@@ -37,8 +37,10 @@ module.exports = function (liquid) {
     render: function (scope, hash) {
       var collection = Liquid.evalExp(this.collection, scope)
 
-      if (!Array.isArray(collection) ||
-                (Array.isArray(collection) && collection.length === 0)) {
+      if (isObject(collection)) {
+        collection = Object.keys(collection)
+      }
+      if (isEmpty(collection)) {
         return liquid.renderer.renderTemplates(this.elseTemplates, scope)
       }
 
@@ -86,4 +88,19 @@ module.exports = function (liquid) {
       }).then(() => html)
     }
   })
+}
+
+function isObject(collection) {
+  if (collection) {
+    const ctr = collection.constructor
+    return ctr === Object || ctr == null
+  }
+  return false
+}
+
+function isEmpty(collection) {
+  if (Array.isArray(collection)) {
+    return !collection.length
+  }
+  return true
 }

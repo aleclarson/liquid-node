@@ -9,9 +9,8 @@ createType('TokenizationError', function(message, token) {
   this.line = token.line
   this.file = token.file
 
-  var context = createContext(token.input, token.line)
   this.message = createMessage(message, token)
-  this.stack = context + '\n' + (this.stack || '')
+  this.context = createContext(token.input, token.line)
 })
 
 createType('ParseError', function(e, token) {
@@ -23,9 +22,8 @@ createType('ParseError', function(e, token) {
   this.line = token.line
   this.file = token.file
 
-  var context = createContext(token.input, token.line)
   this.message = createMessage(e.message || 'Unknown Error', token)
-  this.stack = context + '\n' + (e.stack || '')
+  this.context = createContext(token.input, token.line)
 })
 
 createType('RenderError', function(e, tpl) {
@@ -37,9 +35,8 @@ createType('RenderError', function(e, tpl) {
   this.line = tpl.token.line
   this.file = tpl.token.file
 
-  var context = createContext(tpl.token.input, tpl.token.line)
   this.message = createMessage(e.message || 'Unknown Error', tpl.token)
-  this.stack = context + '\n' + (e.stack || '')
+  this.context = createContext(tpl.token.input, tpl.token.line)
 })
 
 createType('RenderBreakError', function(message) {

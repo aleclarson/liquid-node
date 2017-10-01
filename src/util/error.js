@@ -4,11 +4,6 @@ createType('TokenizationError', function(message, token) {
     Error.captureStackTrace(this, this.constructor)
   }
   this.name = this.constructor.name
-
-  this.input = token.input
-  this.line = token.line
-  this.file = token.file
-
   this.message = createMessage(message, token)
   this.context = createContext(token.input, token.line)
 })
@@ -17,11 +12,6 @@ createType('ParseError', function(e, token) {
   Object.assign(this, e)
   this.originalError = e
   this.name = this.constructor.name
-
-  this.input = token.input
-  this.line = token.line
-  this.file = token.file
-
   this.message = createMessage(e.message || 'Unknown Error', token)
   this.context = createContext(token.input, token.line)
 })
@@ -30,11 +20,6 @@ createType('RenderError', function(e, tpl) {
   Object.assign(this, e)
   this.originalError = e
   this.name = this.constructor.name
-
-  this.input = tpl.token.input
-  this.line = tpl.token.line
-  this.file = tpl.token.file
-
   this.message = createMessage(e.message || 'Unknown Error', tpl.token)
   this.context = createContext(tpl.token.input, tpl.token.line)
 })

@@ -105,16 +105,20 @@ var Scope = {
         case '[':
           push()
 
-          var delemiter = str[i + 1]
-          if (/['"]/.test(delemiter)) { // foo["bar"]
-            j = str.indexOf(delemiter, i + 2)
-            assert(j !== -1, `unbalanced ${delemiter}: ${str}`)
+          var delimiter = str[i + 1]
+          if (/['"]/.test(delimiter)) { // foo["bar"]
+            j = str.indexOf(delimiter, i + 2)
+            if (j === -1) {
+              throw Error(`unbalanced ${delimiter}: ${str}`)
+            }
             name = str.slice(i + 2, j)
             push()
             i = j + 2
           } else { // foo[bar.coo]
             j = matchRightBracket(str, i + 1)
-            assert(j !== -1, `unbalanced []: ${str}`)
+            if (j === -1) {
+              throw Error(`unbalanced []: ${str}`)
+            }
             name = str.slice(i + 1, j)
             if (!lexical.isInteger(name)) { // foo[bar] vs. foo[1]
               name = this.get(name)

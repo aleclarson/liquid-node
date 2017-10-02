@@ -1,50 +1,65 @@
 
-createType('TokenizationError', function(message, token) {
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, this.constructor)
-  }
-  this.name = this.constructor.name
+function ParseError(error, token) {
+  this.message = createMessage(error.message || 'Unknown error while parsing', token)
+  this.context = createContext(token.input, token.line)
+  this.stack = error.stack
+}
+
+function RenderError(error, template) {
+  var token = template.token
+  this.message = createMessage(error.message || 'Unknown error while rendering', token)
+  this.context = createContext(token.input, token.line)
+  this.stack = error.stack
+}
+
+function RenderBreakError(message) {
+  this.message = message || ''
+}
+
+function TokenizationError(message, token) {
   this.message = createMessage(message, token)
   this.context = createContext(token.input, token.line)
-})
+}
 
-createType('ParseError', function(e, token) {
-  Object.assign(this, e)
-  this.originalError = e
-  this.name = this.constructor.name
-  this.message = createMessage(e.message || 'Unknown Error', token)
-  this.context = createContext(token.input, token.line)
-})
+module.exports = {
+  ParseError: createType(ParseError),
+  RenderError: createType(RenderError),
+  RenderBreakError: createType(RenderBreakError),
+  TokenizationError: createType(TokenizationError),
+}
 
-createType('RenderError', function(e, tpl) {
-  Object.assign(this, e)
-  this.originalError = e
-  this.name = this.constructor.name
-  this.message = createMessage(e.message || 'Unknown Error', tpl.token)
-  this.context = createContext(tpl.token.input, tpl.token.line)
-})
+//
+// Helpers
+//
 
-createType('RenderBreakError', function(message) {
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, this.constructor)
-  }
-  this.name = this.constructor.name
-  this.message = message || ''
-})
-
-function createType(name, init) {
-  var ctr = function(e) {
-    if (e instanceof ctr) {
-      return e
+function createType(constructor) {
+  var prototype = constructor.prototype
+  Object.setPrototypeOf(prototype, Error.prototype)
+  function LiquidError(arg) {
+    if (arg && arg.constructor === constructor) {
+      return arg // Pass through an error of the same type.
     }
-    var self = Object.create(ctr.prototype)
-    init.apply(self, arguments)
-    return self
+    var error = Object.create(prototype)
+    error.name = constructor.name
+    constructor.apply(error, arguments)
+    if (!error.stack && Error.captureStackTrace) {
+      Error.captureStackTrace(error, LiquidError)
+    }
+    return error
   }
-  Object.defineProperty(ctr, 'name', {value: name})
-  ctr.prototype = Object.create(Error.prototype)
-  ctr.prototype.constructor = ctr
-  return exports[name] = ctr
+  LiquidError.prototype = prototype
+  return LiquidError
+}
+
+function createMessage(msg, token) {
+  msg = msg || ''
+  if (token.file) {
+    msg += ', file:' + token.file
+  }
+  if (token.line) {
+    msg += ', line:' + token.line
+  }
+  return msg
 }
 
 function createContext(input, line) {
@@ -63,17 +78,6 @@ function createContext(input, line) {
   }
 
   return ctx.map(line => line + '\n').join('')
-}
-
-function createMessage(msg, token) {
-  msg = msg || ''
-  if (token.file) {
-    msg += ', file:' + token.file
-  }
-  if (token.line) {
-    msg += ', line:' + token.line
-  }
-  return msg
 }
 
 function align(n, max) {

@@ -11,7 +11,7 @@ module.exports = function (options) {
     render: function (output, scope) {
       var args = this.args.map(arg => Syntax.evalValue(arg, scope))
       args.unshift(output)
-      return this.filter.apply(null, args)
+      return this.filter.apply(scope, args)
     },
     parse: function (str) {
       var match = lexical.filterLine.exec(str)

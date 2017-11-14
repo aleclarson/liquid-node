@@ -34,19 +34,24 @@ module.exports = {
 
 function createType(constructor) {
   var prototype = constructor.prototype
+  prototype.name = constructor.name
   Object.setPrototypeOf(prototype, Error.prototype)
+
   function LiquidError(arg) {
     if (arg && arg.constructor === constructor) {
       return arg // Pass through an error of the same type.
     }
-    var error = Object.create(prototype)
-    error.name = constructor.name
+
+    var error = Error()
+    Object.setPrototypeOf(error, prototype)
     constructor.apply(error, arguments)
+
     if (!error.stack && Error.captureStackTrace) {
       Error.captureStackTrace(error, LiquidError)
     }
     return error
   }
+
   LiquidError.prototype = prototype
   return LiquidError
 }

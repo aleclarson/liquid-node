@@ -15,6 +15,7 @@ function hash (markup, scope) {
 
 function TagCache(engine) {
   this.engine = engine
+  this.renderer = engine.renderer
   this.tags = {}
   return this
 }

@@ -5,6 +5,7 @@ var valueRE = new RegExp(`${lexical.value.source}`, 'g')
 
 function FilterCache(engine, options) {
   this.engine = engine
+  this.renderer = engine.renderer
   this.filters = {}
   this.strict_filters = options.strict_filters
   return this

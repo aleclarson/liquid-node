@@ -2,8 +2,8 @@ const Scope = require('./src/scope')
 const tokenizer = require('./src/tokenizer')
 const Render = require('./src/render')
 const lexical = require('./src/lexical')
-const Tag = require('./src/tag')
-const Filter = require('./src/filter')
+const TagCache = require('./src/tag')
+const FilterCache = require('./src/filter')
 const Parser = require('./src/parser')
 const Syntax = require('./src/syntax')
 const tags = require('./tags')
@@ -11,19 +11,28 @@ const filters = require('./filters')
 const anySeries = require('./src/util/promise').anySeries
 const Errors = require('./src/util/error')
 
-var _engine = {
-  init: function (tag, filter, options) {
-    this.options = options
-    this.tag = tag
-    this.filter = filter
-    this.parser = Parser(tag, filter)
-    this.renderer = Render()
+function Engine(options) {
+  options = Object.assign({
+    trim_right: false,
+    trim_left: false,
+    strict_filters: false,
+    strict_variables: false
+  }, options)
 
-    tags(this)
-    filters(this)
+  this.options = options
+  this.tag = new TagCache(this)
+  this.filter = new FilterCache(this, options)
+  this.parser = Parser(tag, filter)
+  this.renderer = Render()
 
-    return this
-  },
+  tags(this)
+  filters(this)
+
+  return this
+}
+
+Engine.prototype = {
+  constructor: Engine,
   parse: function (html, filepath) {
     var tokens = tokenizer.parse(html, filepath, this.options)
     return this.parser.parse(tokens)
@@ -56,28 +65,17 @@ var _engine = {
   }
 }
 
-function factory (options) {
-  options = Object.assign({
-    trim_right: false,
-    trim_left: false,
-    strict_filters: false,
-    strict_variables: false
-  }, options)
+Object.assign(Engine, {
+  lexical: lexical,
+  isTruthy: Syntax.isTruthy,
+  isFalsy: Syntax.isFalsy,
+  evalExp: Syntax.evalExp,
+  evalValue: Syntax.evalValue,
+  Types: {
+    ParseError: Errors.ParseError,
+    TokenizationEroor: Errors.TokenizationError,
+    RenderBreakError: Errors.RenderBreakError,
+  }
+})
 
-  var engine = Object.create(_engine)
-  engine.init(Tag(), Filter(options), options)
-  return engine
-}
-
-factory.lexical = lexical
-factory.isTruthy = Syntax.isTruthy
-factory.isFalsy = Syntax.isFalsy
-factory.evalExp = Syntax.evalExp
-factory.evalValue = Syntax.evalValue
-factory.Types = {
-  ParseError: Errors.ParseError,
-  TokenizationEroor: Errors.TokenizationError,
-  RenderBreakError: Errors.RenderBreakError,
-}
-
-module.exports = factory
+module.exports = Engine

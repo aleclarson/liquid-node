@@ -13,58 +13,62 @@ function hash (markup, scope) {
   return obj
 }
 
-module.exports = function () {
-  var tagImpls = {}
+function TagCache(engine) {
+  this.engine = engine
+  this.tags = {}
+  return this
+}
 
-  var _tagInstance = {
-    render: function (scope) {
-      var obj = hash(this.token.args, scope)
-      var impl = this.tagImpl
-      if (typeof impl.render !== 'function') {
-        return Promise.resolve('')
-      }
-      return Promise.resolve()
-                .then(() => typeof impl.render === 'function'
-                    ? impl.render(scope, obj) : '')
-                .catch(function (e) {
-                  if (e instanceof Error) {
-                    throw e
-                  }
-                  var msg = `Please reject with an Error in ${impl.render}, got ${e}`
-                  throw Error(msg)
-                })
-    },
-    parse: function (token, tokens) {
-      this.type = 'tag'
-      this.token = token
-      this.name = token.name
-
-      var tagImpl = tagImpls[this.name]
-      if (!tagImpl) throw Error(`tag ${this.name} not found`)
-      this.tagImpl = Object.create(tagImpl)
-      if (this.tagImpl.parse) {
-        this.tagImpl.parse(token, tokens)
-      }
+TagCache.prototype = {
+  constructor: TagCache,
+  register: function(name, tagImpl) {
+    this.tags[name] = tagImpl
+  },
+  parse: function(token, tokens) {
+    var tag = new Tag(token)
+    if (!this.tags.hasOwnProperty(tag.name)) {
+      throw Error(`[Liquid] Tag does not exist: '${tag.name}'`)
     }
+    var tagImpl = Object.create this.tags[tag.name]
+    tagImpl.engine = this.engine
+    if (typeof tagImpl.parse == 'function') {
+      tagImpl.parse(token, tokens)
+    }
+    tag.tagImpl = tagImpl
+    return tag
+  },
+  clear: function() {
+    this.tags = {}
   }
+}
 
-  function register (name, tag) {
-    tagImpls[name] = tag
-  }
+// Exports
+module.exports = TagCache
+TagCache.Tag = Tag
 
-  function construct (token, tokens) {
-    var instance = Object.create(_tagInstance)
-    instance.parse(token, tokens)
-    return instance
-  }
+function Tag(token) {
+  this.type = 'tag'
+  this.token = token
+  this.name = token.name
+  return this
+}
 
-  function clear () {
-    tagImpls = {}
-  }
-
-  return {
-    construct,
-    register,
-    clear
+Tag.prototype = {
+  constructor: Tag,
+  render: function(scope) {
+    var obj = hash(this.token.args, scope)
+    var impl = this.tagImpl
+    if (typeof impl.render !== 'function') {
+      return Promise.resolve('')
+    }
+    return Promise.resolve()
+      .then(() => impl.render(scope, obj))
+      .catch(function (e) {
+        if (e instanceof Error) {
+          throw e
+        }
+        var msg = `Please reject with an Error in ${impl.render}, got ${e}`
+        throw Error(msg)
+      })
   }
 }

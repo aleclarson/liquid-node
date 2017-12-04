@@ -3,62 +3,64 @@ const Syntax = require('./syntax')
 
 var valueRE = new RegExp(`${lexical.value.source}`, 'g')
 
-module.exports = function (options) {
-  options = Object.assign({}, options)
-  var filters = {}
+function FilterCache(engine, options) {
+  this.engine = engine
+  this.filters = {}
+  this.strict_filters = options.strict_filters
+  return this
+}
 
-  var _filterInstance = {
-    render: function (output, scope) {
-      var args = this.args.map(arg => Syntax.evalValue(arg, scope))
-      args.unshift(output)
-      return this.filter.apply(scope, args)
-    },
-    parse: function (str) {
-      var match = lexical.filterLine.exec(str)
-      if (!match) throw Error('illegal filter: ' + str)
+FilterCache.prototype = {
+  constructor: FilterCache,
+  register: function(name, filter) {
+    this.filters[name] = filter
+  },
+  parse: function() {
+    var match = lexical.filterLine.exec(str)
+    if (!match) throw Error('illegal filter: ' + str)
 
-      var name = match[1]
-      var argList = match[2] || ''
-      var filter = filters[name]
-      if (typeof filter !== 'function') {
-        if (options.strict_filters) {
-          throw TypeError(`undefined filter: ${name}`)
-        }
-        this.name = name
-        this.filter = x => x
-        this.args = []
-        return this
-      }
-
+    var name = match[1]
+    var argList = match[2] || ''
+    var filter = filters[name]
+    if (typeof filter == 'function') {
       var args = []
       while ((match = valueRE.exec(argList.trim()))) {
         var v = match[0]
         var re = new RegExp(`${v}\\s*:`, 'g')
         re.test(match.input) ? args.push(`'${v}'`) : args.push(v)
       }
-
-      this.name = name
-      this.filter = filter
-      this.args = args
-
-      return this
+      filter = new Filter(name, args, filter)
+    } else if (this.strict_filters) {
+      throw TypeError(`undefined filter: ${name}`)
+    } else {
+      filter = new Filter(name, [], x => x)
     }
-  }
 
-  function construct (str) {
-    var instance = Object.create(_filterInstance)
-    return instance.parse(str)
+    filter.engine = this.engine
+    return filter
+  },
+  clear: function() {
+    this.filters = {}
   }
+}
 
-  function register (name, filter) {
-    filters[name] = filter
-  }
+// Exports
+module.exports = FilterCache
+FilterCache.Filter = Filter
 
-  function clear () {
-    filters = {}
-  }
+function Filter(name, args, filter) {
+  this.name = name
+  this.filter = filter
+  this.args = args
+  this.engine = null
+  return this
+}
 
-  return {
-    construct, register, clear
+Filter.prototype = {
+  constructor: Filter,
+  render: function (output, scope) {
+    var args = this.args.map(arg => Syntax.evalValue(arg, scope))
+    args.unshift(output)
+    return this.filter.apply(this.engine, args, scope)
   }
 }

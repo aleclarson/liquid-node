@@ -7,14 +7,14 @@ const sinon = require('sinon')
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
 
-var tag = require('../src/tag.js')()
 var Scope = require('../src/scope.js')
-var filter = require('../src/filter')()
 var Render = require('../src/render.js')
 var Template = require('../src/parser.js')(tag, filter)
+var TagRegistry = require('../src/tag.js')()
+var FilterRegistry = require('../src/filter')()
 
 describe('render', function () {
-  var scope, render
+  var scope, render, filters
 
   beforeEach(function () {
     scope = Scope.factory({
@@ -22,8 +22,7 @@ describe('render', function () {
         bar: ['a', 2]
       }
     })
-    filter.clear()
-    tag.clear()
+    filters = new FilterRegistry({}, {})
     render = Render()
   })
 
@@ -42,8 +41,8 @@ describe('render', function () {
   it('should eval filter with correct arguments', function () {
     var date = sinon.stub().returns('y')
     var time = sinon.spy()
-    filter.register('date', date)
-    filter.register('time', time)
+    filters.register('date', date)
+    filters.register('time', time)
     var tpl = Template.parseOutput('foo.bar[0] | date: "b" | time:2')
     render.evalOutput(tpl, scope)
     expect(date).to.have.been.calledWith('a', 'b')
@@ -57,8 +56,8 @@ describe('render', function () {
       }).to.throw(/scope undefined/)
     })
     it('should eval output', function () {
-      filter.register('date', (l, r) => l + r)
-      filter.register('time', (l, r) => l + 3 * r)
+      filters.register('date', (l, r) => l + r)
+      filters.register('time', (l, r) => l + 3 * r)
       var tpl = Template.parseOutput('foo.bar[0] | date: "b" | time:2')
       expect(render.evalOutput(tpl, scope)).to.equal('ab6')
     })

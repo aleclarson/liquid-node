@@ -3,20 +3,20 @@ const expect = chai.expect
 
 chai.use(require('sinon-chai'))
 
-var filter = require('../src/filter.js')()
-var tag = require('../src/tag.js')()
+var FilterRegistry = require('../src/filter.js')()
+var TagRegistry = require('../src/tag.js')()
 var Template = require('../src/parser.js')
 
 describe('template', function () {
-  var template
+  var tags, filters, template
   var add = (l, r) => l + r
 
   beforeEach(function () {
-    filter.clear()
+    tags = new TagRegistry({})
+    filters = new FilterRegistry({}, {})
     filter.register('add', add)
 
-    tag.clear()
-    template = Template(tag, filter)
+    template = Template(tags, filters)
   })
 
   it('should throw when output string illegal', function () {

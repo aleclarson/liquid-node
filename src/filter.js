@@ -3,26 +3,25 @@ const Syntax = require('./syntax')
 
 var valueRE = new RegExp(`${lexical.value.source}`, 'g')
 
-function FilterCache(engine, options) {
+function FilterRegistry(engine, options) {
   this.engine = engine
-  this.renderer = engine.renderer
   this.filters = {}
   this.strict_filters = options.strict_filters
   return this
 }
 
-FilterCache.prototype = {
-  constructor: FilterCache,
+FilterRegistry.prototype = {
+  constructor: FilterRegistry,
   register: function(name, filter) {
     this.filters[name] = filter
   },
-  parse: function() {
+  construct: function(str) {
     var match = lexical.filterLine.exec(str)
     if (!match) throw Error('illegal filter: ' + str)
 
     var name = match[1]
     var argList = match[2] || ''
-    var filter = filters[name]
+    var filter = this.filters[name]
     if (typeof filter == 'function') {
       var args = []
       while ((match = valueRE.exec(argList.trim()))) {
@@ -39,21 +38,17 @@ FilterCache.prototype = {
 
     filter.engine = this.engine
     return filter
-  },
-  clear: function() {
-    this.filters = {}
   }
 }
 
 // Exports
-module.exports = FilterCache
-FilterCache.Filter = Filter
+module.exports = FilterRegistry
+FilterRegistry.Filter = Filter
 
 function Filter(name, args, filter) {
   this.name = name
   this.filter = filter
   this.args = args
-  this.engine = null
   return this
 }
 

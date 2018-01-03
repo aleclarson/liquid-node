@@ -2,16 +2,13 @@ const Scope = require('./scope')
 const tokenizer = require('./tokenizer')
 const Render = require('./render')
 const lexical = require('./lexical')
-const TagCache = require('./tag')
-const FilterCache = require('./filter')
+const TagRegistry = require('./tag')
+const FilterRegistry = require('./filter')
 const Parser = require('./parser')
 const Syntax = require('./syntax')
-const tags = require('../tags')
-const filters = require('../filters')
-const anySeries = require('./util/promise').anySeries
 const Errors = require('./util/error')
 
-module.exports = function Engine(options) {
+function Engine(options) {
   options = Object.assign({
     trim_right: false,
     trim_left: false,
@@ -20,16 +17,19 @@ module.exports = function Engine(options) {
   }, options)
 
   this.options = options
-  this.tag = new TagCache(this)
-  this.filter = new FilterCache(this, options)
-  this.parser = Parser(tag, filter)
+  this.context = {}
+  this.tags = new TagRegistry(this)
+  this.filters = new FilterRegistry(this, options)
+  this.parser = Parser(this.tags, this.filters)
   this.renderer = Render()
 
-  tags(this)
-  filters(this)
+  require('../tags')(this)
+  require('../filters')(this)
 
   return this
 }
+
+module.exports = Engine
 
 Engine.prototype = {
   constructor: Engine,
@@ -38,8 +38,13 @@ Engine.prototype = {
     return this.parser.parse(tokens)
   },
   render: function (tpl, ctx, opts) {
+    if (ctx == null) {
+      ctx = Object.create(this.context)
+    } else {
+      Object.setPrototypeOf(ctx, this.context)
+    }
     opts = Object.assign({}, this.options, opts)
-    var scope = Scope.factory(ctx || {}, opts)
+    var scope = Scope.factory(ctx, opts)
     return this.renderer.renderTemplates(tpl, scope)
   },
   parseAndRender: function (html, ctx, opts) {
@@ -58,10 +63,10 @@ Engine.prototype = {
     return this.renderer.evalOutput(tpl, scope)
   },
   registerFilter: function (name, filter) {
-    return this.filter.register(name, filter)
+    return this.filters.register(name, filter)
   },
   registerTag: function (name, tag) {
-    return this.tag.register(name, tag)
+    return this.tags.register(name, tag)
   }
 }
 

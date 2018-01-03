@@ -13,39 +13,35 @@ function hash (markup, scope) {
   return obj
 }
 
-function TagCache(engine) {
+function TagRegistry(engine) {
   this.engine = engine
-  this.renderer = engine.renderer
   this.tags = {}
   return this
 }
 
-TagCache.prototype = {
-  constructor: TagCache,
+TagRegistry.prototype = {
+  constructor: TagRegistry,
   register: function(name, tagImpl) {
     this.tags[name] = tagImpl
   },
-  parse: function(token, tokens) {
+  construct: function(token, tokens) {
     var tag = new Tag(token)
     if (!this.tags.hasOwnProperty(tag.name)) {
       throw Error(`[Liquid] Tag does not exist: '${tag.name}'`)
     }
-    var tagImpl = Object.create this.tags[tag.name]
+    var tagImpl = Object.create(this.tags[tag.name])
     tagImpl.engine = this.engine
     if (typeof tagImpl.parse == 'function') {
       tagImpl.parse(token, tokens)
     }
     tag.tagImpl = tagImpl
     return tag
-  },
-  clear: function() {
-    this.tags = {}
   }
 }
 
 // Exports
-module.exports = TagCache
-TagCache.Tag = Tag
+module.exports = TagRegistry
+TagRegistry.Tag = Tag
 
 function Tag(token) {
   this.type = 'tag'

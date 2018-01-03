@@ -1,7 +1,7 @@
 const lexical = require('./lexical')
 const ParseError = require('./util/error').ParseError
 
-module.exports = function (Tag, Filter) {
+module.exports = function (tags, filters) {
   var stream = {
     init: function (tokens) {
       this.tokens = tokens
@@ -68,7 +68,15 @@ module.exports = function (Tag, Filter) {
 
   function parseTag (token, tokens) {
     if (token.name === 'continue' || token.name === 'break') return token
-    return Tag.construct(token, tokens)
+    return tags.construct(token, tokens)
+  }
+
+  function parseFilters (str) {
+    var filters = []
+    while ((match = lexical.filter.exec(str))) {
+      filters.push([match[0].trim()])
+    }
+    return filters
   }
 
   function parseOutput (str) {
@@ -78,15 +86,11 @@ module.exports = function (Tag, Filter) {
     var initial = match[0]
     str = str.substr(match.index + match[0].length)
 
-    var filters = []
-    while ((match = lexical.filter.exec(str))) {
-      filters.push([match[0].trim()])
-    }
 
     return {
       type: 'output',
       initial: initial,
-      filters: filters.map(str => Filter.construct(str))
+      filters: parseFilters(str).map(str => filters.construct(str))
     }
   }
 
